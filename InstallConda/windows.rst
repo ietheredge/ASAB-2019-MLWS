@@ -20,8 +20,10 @@ Installing on Windows
    When installation is finished, from the **Start** menu, open the
    Anaconda Prompt.
 
-#. :doc:`Test your installation <test-installation>`.
+#. To test your installation, in your terminal window or Anaconda Prompt, run the command ``conda list``.
 
+For a successful installation, a list of installed packages
+appears.
 
 .. _install-win-silent:
 

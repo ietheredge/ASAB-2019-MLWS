@@ -26,8 +26,11 @@ Installing on macOS
 #. To make the changes take effect, close and then re-open your
    terminal window.
 
-#. :doc:`Test your installation <test-installation>`.
 
+#. To test your installation, in your terminal window or Anaconda Prompt, run the command ``conda list``.
+
+For a successful installation, a list of installed packages
+appears.
 
 .. _install-macos-silent:
 
