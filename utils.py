@@ -1,15 +1,15 @@
-from keras.applications.inception_v3 import InceptionV3
-from keras.layers import Input, Dense, Dropout, TimeDistributed, Bidirectional, Flatten
-from keras.layers.recurrent import LSTM
-from keras.layers import Conv1D, AveragePooling1D, Flatten, Concatenate, MaxPooling1D ,ConvLSTM2D
-from keras.layers import Lambda, Reshape, Activation, Add, UpSampling1D
-from keras.models import Model
-from keras.models import Sequential
-from keras.layers.normalization import BatchNormalization
-from keras.layers import GlobalAveragePooling2D, AveragePooling1D
-from keras.utils.generic_utils import get_custom_objects
+from tensorflow.keras.applications.inception_v3 import InceptionV3
+from tensorflow.keras.layers import Input, Dense, Dropout, TimeDistributed, Bidirectional, Flatten
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.layers import Conv1D, AveragePooling1D, Flatten, Concatenate, MaxPooling1D ,ConvLSTM2D
+from tensorflow.keras.layers import Lambda, Reshape, Activation, Add, UpSampling1D
+from tensorflow.keras.models import Model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.layers import GlobalAveragePooling2D, AveragePooling1D
+# from tensorflow.keras.utils.generic_utils import get_custom_objects
 from sklearn.model_selection import train_test_split
-from keras.preprocessing import image
+from tensorflow.keras.preprocessing import image
 from itertools import cycle
 import keras
 import numpy as np
