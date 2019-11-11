@@ -143,6 +143,7 @@ def build_perceptual_model():
         feature_model.layers[-1].outbound_nodes = []
     return feature_model
 
+
 def extract(model, image_path):
     img = image.load_img(image_path, target_size=(299, 299))
     x = image.img_to_array(img)
@@ -156,47 +157,62 @@ def extract(model, image_path):
 
     return features
 
+
 def evenly_subsample_features(labels, features, idx, counts, seq_len, seq_stps, n_features):
     c = cycle([i for i in np.unique(idx)])
     n_examples = int(np.min(counts)-seq_len)
-    if seq_stps == 0:
-        X = np.empty((n_examples*len(np.unique(idx)), seq_len, n_features))
-        Y = np.empty((n_examples*len(np.unique(idx)), seq_len, labels.shape[1]))
-        for j in range(n_examples*len(np.unique(idx))):
-            i = next(c)
-            try:
-                ix = np.random.choice(np.where(idx==i)[0])
-                X[j, :, :] = features[ix-int(seq_len/2):
-                                      ix+int(seq_len/2)]
-                Y[j, :, :] = labels[ix-int(seq_len/2):
-                                    ix+int(seq_len/2)]
-            except ValueError:
-                ix = np.random.choice(np.where(idx==i)[0])
-                X[j, :, :] = features[ix-int(seq_len/2):
-                                      ix+int(seq_len/2)]
-                Y[j, :, :] = labels[ix-int(seq_len/2):
-                                    ix+int(seq_len/2)]
-    else:
-        X = np.empty((n_examples*len(np.unique(idx)),
-                      seq_stps,
-                      int(seq_len/seq_stps),
-                      n_features))
-        
+    if seq_steps == None:
+        X = np.empty((n_examples*len(np.unique(idx)), n_features))
         Y = np.empty((n_examples*len(np.unique(idx)), labels.shape[1]))
         for j in range(n_examples*len(np.unique(idx))):
             i = next(c)
             try:
                 ix = np.random.choice(np.where(idx==i)[0])
-                X[j, :, :] = features[ix-int(seq_len/2):
-                                      ix+int(seq_len/2)].reshape((seq_stps,
-                                              int(seq_len/seq_stps),
-                                              n_features))
+                X[j, :] = features[ix]
                 Y[j, :] = labels[ix]
             except ValueError:
                 ix = np.random.choice(np.where(idx==i)[0])
-                X[j, :, :] = features[ix-int(seq_len/2):
-                                      ix+int(seq_len/2)].reshape((seq_stps,
-                                              int(seq_len/seq_stps),
-                                              n_features))
+                X[j, :] = features[ix]
                 Y[j, :] = labels[ix]
+    else:
+        if seq_stps == 0:
+            X = np.empty((n_examples*len(np.unique(idx)), seq_len, n_features))
+            Y = np.empty((n_examples*len(np.unique(idx)), seq_len, labels.shape[1]))
+            for j in range(n_examples*len(np.unique(idx))):
+                i = next(c)
+                try:
+                    ix = np.random.choice(np.where(idx==i)[0])
+                    X[j, :, :] = features[ix-int(seq_len/2):
+                                        ix+int(seq_len/2)]
+                    Y[j, :, :] = labels[ix-int(seq_len/2):
+                                        ix+int(seq_len/2)]
+                except ValueError:
+                    ix = np.random.choice(np.where(idx==i)[0])
+                    X[j, :, :] = features[ix-int(seq_len/2):
+                                        ix+int(seq_len/2)]
+                    Y[j, :, :] = labels[ix-int(seq_len/2):
+                                        ix+int(seq_len/2)]
+        else:
+            X = np.empty((n_examples*len(np.unique(idx)),
+                        seq_stps,
+                        int(seq_len/seq_stps),
+                        n_features))
+            
+            Y = np.empty((n_examples*len(np.unique(idx)), labels.shape[1]))
+            for j in range(n_examples*len(np.unique(idx))):
+                i = next(c)
+                try:
+                    ix = np.random.choice(np.where(idx==i)[0])
+                    X[j, :, :] = features[ix-int(seq_len/2):
+                                        ix+int(seq_len/2)].reshape((seq_stps,
+                                                int(seq_len/seq_stps),
+                                                n_features))
+                    Y[j, :] = labels[ix]
+                except ValueError:
+                    ix = np.random.choice(np.where(idx==i)[0])
+                    X[j, :, :] = features[ix-int(seq_len/2):
+                                        ix+int(seq_len/2)].reshape((seq_stps,
+                                                int(seq_len/seq_stps),
+                                                n_features))
+                    Y[j, :] = labels[ix]
     return X, Y
