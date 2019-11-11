@@ -161,7 +161,7 @@ def extract(model, image_path):
 def evenly_subsample_features(labels, features, idx, counts, seq_len, seq_stps, n_features):
     c = cycle([i for i in np.unique(idx)])
     n_examples = int(np.min(counts)-seq_len)
-    if seq_steps == None:
+    if seq_stps is None:
         X = np.empty((n_examples*len(np.unique(idx)), n_features))
         Y = np.empty((n_examples*len(np.unique(idx)), labels.shape[1]))
         for j in range(n_examples*len(np.unique(idx))):
