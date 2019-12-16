@@ -11,7 +11,7 @@ from tensorflow.keras.layers import GlobalAveragePooling2D, AveragePooling1D
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing import image
 from itertools import cycle
-import keras
+import tensorflow.keras as keras
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -66,6 +66,55 @@ def upsample_1D(inputs, residual, filters, kernel_size=3):
     conv = Activation('relu')(conv)
     conv = UpSampling1D()(conv)
     return conv
+
+class Hourglass(layer.Layers):
+    def __init__(self, input_shape, conv_filter_size=3, conv_kernel_size=3, n_pooling_upsampling_steps=1, n_stacks=1, n_classes=4):
+        super(Hourglass, self).__init__()
+        self.input_shape = input_shape
+        self.conv_filter_size = conv_filter_size
+        self.conv_kernel_size = conv_kernel_size
+        self.n_pooling_upsampling_steps = n_pooling_upsampling_steps
+        self.n_stacks = n_stacks
+        self.n_classes = n_classes
+
+    def build(self):
+        self.input_layer = Input(shape=self.input_shape, name='input')
+        x = self.pool_1D(self.input_layer, self.conv_filter_size)
+        res1 = x
+        outputs = []
+    
+        for n in range(self.n_stacks):
+            for idx in range(self.n_pooling_upsampling_steps):
+                x = self.pool_1D(x, self.conv_filter_size*(idx+1), kernel_size=conv_kernel_size)
+                outputs.append(x)
+
+            for idx in range(n_pooling_upsampling_steps):
+                x = self.upsample_1D(x, outputs[-(idx+1)], conv_filter_size*(n_pooling_upsampling_steps-idx), kernel_size=conv_kernel_size)
+
+        x = self.upsample_1D(x, res1,  conv_filter_size)
+        x = Conv1D(n_classes, (conv_kernel_size), padding='same')(x)
+        x = Activation('relu')(x)
+        self.model = Model(input_layer, x)
+
+    def call(self, inputs):
+        return self.model(inputs).outputs
+
+    @staticmethod
+    def pool_1D(inputs, filters, kernel_size=3):
+        conv = Conv1D(filters, (kernel_size), padding='same')(inputs)
+        conv = Activation('relu')(conv)
+        conv = Dropout(0.2)(conv)
+        conv = AveragePooling1D()(conv)
+        return conv
+
+    @staticmethod
+    def upsample_1D(inputs, residual, filters, kernel_size=3):
+        conv = Conv1D(filters, (kernel_size), padding='same')(inputs)
+        residual = Conv1D(filters, (1))(residual)
+        conv = Add()([conv,residual])
+        conv = Activation('relu')(conv)
+        conv = UpSampling1D()(conv)
+        return conv
 
 def build_hourglass_model(input_shape, conv_filter_size=3, conv_kernel_size=3, n_pooling_upsampling_steps=1, n_stacks=1, n_classes=4):
     input_layer = Input(shape=input_shape, name='input')
@@ -122,6 +171,8 @@ def build_conv_lstm_2d_model(input_shape=None, nb_classes=4, conv_filters=8, con
     model = Model(inputs, x)
     return model
 
+def build_hourglass_lstm_model:
+    
 
 def build_perceptual_model():
     weights = None
