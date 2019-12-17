@@ -67,6 +67,7 @@ def upsample_1D(inputs, residual, filters, kernel_size=3):
     conv = UpSampling1D()(conv)
     return conv
 
+
 class Hourglass(layer.Layers):
     def __init__(self, input_shape, conv_filter_size=3, conv_kernel_size=3, n_pooling_upsampling_steps=1, n_stacks=1, n_classes=4):
         super(Hourglass, self).__init__()
@@ -82,7 +83,6 @@ class Hourglass(layer.Layers):
         x = self.pool_1D(self.input_layer, self.conv_filter_size)
         res1 = x
         outputs = []
-    
         for n in range(self.n_stacks):
             for idx in range(self.n_pooling_upsampling_steps):
                 x = self.pool_1D(x, self.conv_filter_size*(idx+1), kernel_size=conv_kernel_size)
@@ -95,6 +95,7 @@ class Hourglass(layer.Layers):
         x = Conv1D(n_classes, (conv_kernel_size), padding='same')(x)
         x = Activation('relu')(x)
         self.model = Model(input_layer, x)
+        super(Hourglass, self).build(self.input_shape)
 
     def call(self, inputs):
         return self.model(inputs).outputs
